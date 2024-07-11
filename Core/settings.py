@@ -1,13 +1,13 @@
-
 from pathlib import Path
 import os
-import environ 
+import environ
+from datetime import timedelta
 
 env = environ.Env()
 environ.Env.read_env()
 
-ENVIRONMENT = env
 
+ENVIRONMENT = env
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,6 +24,7 @@ DEBUG =os.environ['DEBUG']
 ALLOWED_HOSTS = []
 
 
+# Application definition
 
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -36,7 +37,7 @@ DJANGO_APPS = [
 ]
 
 # here we put on all apps we will create
-PROJECT_APPS = ['apps.categorias','apps.productos']
+PROJECT_APPS = []
 ECOMMERCE_APPS = []
 
 
@@ -84,7 +85,7 @@ ROOT_URLCONF = 'Core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'build')], # es donde vamos a mostrar todos los templates de react
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -104,14 +105,11 @@ WSGI_APPLICATION = 'Core.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+     "default": env.db("DATABASE_URL", default="postgres:///EcommerceNuevo"),
+ }
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
-
-
+#in this place put on all the domain that will have access to the applications
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8000",
@@ -142,6 +140,8 @@ PASSWORD_HASHERS = [ #this is to make all password will be more safe
     "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
     "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
 ]
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
