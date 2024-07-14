@@ -1,4 +1,3 @@
-import { type } from "@testing-library/user-event/dist/type"
 import {
     SIGNUP_SUCCESS,
     SIGNUP_FAIL,
@@ -20,11 +19,11 @@ import {
     RESET_PASSWORD_CONFIRM_SUCCESS,
     RESET_PASSWORD_CONFIRM_FAIL,
 } from "./types"
-
+import setAelrt from "./alert"
 import axios from "axios"
 
 export const Sign_Up = (first_name,last_name,email,password,re_password) => async (dispatch) =>{
-    dispatch = ({
+    dispatch({
         type : SET_AUTH_LOADING
     })
 
@@ -47,19 +46,62 @@ export const Sign_Up = (first_name,last_name,email,password,re_password) => asyn
       config)
       try {
         if (res.status === 200)
-        dispatch = ({
+       { dispatch({
             type: SIGNUP_SUCCESS,
             payload: res.data
         })
-        else {
-            dispatch=({
+        dispatch (setAelrt("por favor ingrese a su email para poder activar la cuenta","green"))
+        }else {
+            dispatch({
                 type:SIGNUP_FAIL
             })
+            dispatch (setAelrt("error no se ha podido realizar el registro de la cuenta","red"))
+
         }
         
       } catch (error) {
-        dispatch=({
+        dispatch({
             type:SIGNUP_FAIL
         })
+        dispatch (setAelrt("error no se ha podido realizar el registro de la cuenta","red"))
+
       }
 }
+
+
+
+
+export const Load_user = () => async dispatch => {
+    if(localStorage.getItem('access')){
+      const config = {
+          headers: {
+              'Authorization': `JWT ${localStorage.getItem('access')}`,
+              'Accept': 'application/json'
+          }
+      };
+  
+      try {
+          const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/users/me/`, config);
+      
+          if (res.status === 200) {
+              dispatch({
+                  type: USER_LOADED_SUCCESS,
+                  payload: res.data
+              });
+          } else {
+              dispatch({
+                  type: USER_LOADED_FAIL
+              });
+          }
+      }
+      catch(err){
+          dispatch({
+              type: USER_LOADED_FAIL
+          });
+      }
+  } else {
+      dispatch({
+          type: USER_LOADED_FAIL
+      });
+  }
+  };
