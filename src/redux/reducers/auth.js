@@ -44,16 +44,22 @@ export default function (state = initialState, actions) {
         loading: false,
       };
 
-      case USER_LOADED_SUCCESS:
-        return {
-          ...state,
-          user: payload,
-        };
-      case USER_LOADED_FAIL:
-        return {
-          ...state,
-          user: null,
-        };
+    case USER_LOADED_SUCCESS:
+      return {
+        ...state,
+        user: payload,
+      };
+    case USER_LOADED_FAIL:
+      return {
+        ...state,
+        user: null,
+      };
+
+    case ACTIVATION_SUCCESS:
+    case ACTIVATION_FAIL:
+      return {
+        ...state,
+      };
 
     case SIGNUP_SUCCESS:
     case SIGNUP_FAIL:

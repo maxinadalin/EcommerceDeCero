@@ -21,6 +21,8 @@ import {
 } from "./types"
 import setAelrt from "./alert"
 import axios from "axios"
+import { ArrowUpTrayIcon } from "@heroicons/react/16/solid"
+
 
 export const Sign_Up = (first_name,last_name,email,password,re_password) => async (dispatch) =>{
     dispatch({
@@ -68,7 +70,45 @@ export const Sign_Up = (first_name,last_name,email,password,re_password) => asyn
       }
 }
 
+export const Activate = (iud,token) = async (dispatch) => {
+    const config = {
+        headers : ({
+            "Authorization" : "application/json"
+        })
+    }
+    const body = JSON.stringify({
+        uid,
+        token
+    })
 
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/activation/`,
+      body,
+      config)
+
+      try {
+        if (res.data === 200) {
+            dispatch({
+                type:ACTIVATION_SUCCESS,
+                payload:res.data
+            })
+            dispatch(setAelrt("activacion realizada con exito","green"))
+
+        }
+        else{
+            dispatch({
+                type:ACTIVATION_FAIL,
+            })
+            dispatch(setAelrt("no se pudo realizar la activacion","red"))
+        }
+        
+      } catch (error) {
+        dispatch({
+            type:ACTIVATION_FAIL,
+        })
+        dispatch(setAelrt("no se pudo realizar la activacion","red"))
+
+      }
+}
 
 
 export const Load_user = () => async dispatch => {
