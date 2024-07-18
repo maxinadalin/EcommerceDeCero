@@ -21,7 +21,7 @@ import {
 } from "./types"
 import setAelrt from "./alert"
 import axios from "axios"
-import { ArrowUpTrayIcon } from "@heroicons/react/16/solid"
+
 
 
 export const Sign_Up = (first_name,last_name,email,password,re_password) => async (dispatch) =>{
@@ -111,7 +111,7 @@ export const Activate = (iud,token) = async (dispatch) => {
 }
 
 
-export const Load_user = () => async dispatch => {
+export const Load_user = () => async (dispatch) => {
     if(localStorage.getItem('access')){
       const config = {
           headers: {
@@ -145,3 +145,198 @@ export const Load_user = () => async dispatch => {
       });
   }
   };
+
+export const Sign_In = (email,password) = async (dispatch) =>{
+    dispatch({
+        type:SET_AUTH_LOADING
+    })
+    const config = {
+        headers : {
+            "Content-Type" : "application/json"
+        }
+    }
+    const body = JSON.stringify({
+        email,
+        password
+    })
+
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/jwt/create/`,
+      body,
+      config)
+
+      try {
+        if (res.status === 200) {
+            dispatch({
+                type:LOGIN_SUCCESS,
+                payload:res.data
+            })
+            dispatch(Load_user())
+            dispatch(setAelrt("inicio de sesion realizado con exitos","green"))
+            dispatch({
+                type:REMOVE_AUTH_LOADING
+            })
+        }
+        else{
+            dispatch({
+                type:LOGIN_FAIL
+            })
+            dispatch(setAelrt("ha ocurrido un error no se ha podido iniciar sesion"))
+            dispatch({
+                type:REMOVE_AUTH_LOADING
+            })
+        }
+      } catch (error) {
+        dispatch({
+            type:LOGIN_FAIL
+        })
+        dispatch(setAelrt("ha ocurrido un error no se ha podido iniciar sesion"))
+        dispatch({
+            type:REMOVE_AUTH_LOADING
+        })
+      }
+}
+
+export const refresh = () => async (dispatch) => {
+    if (localStorage.getItem("refresh")) {
+        const config = {
+            headers : {
+                "accept" : "application/json",
+                "Content-Type" : "application/json"
+            }
+        }
+        const body = JSON.stringify({
+            refresh : localStorage.getItem("refresh")
+        })
+
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/jwt/refresh/`,
+      body,
+      config)
+
+      try {
+        if (res.status === 200) {
+            dispatch({
+                type:REFRESH_SUCCESS,
+                payload:res.data
+            })
+        }
+        else{
+            dispatch({
+                type:REFRESH_FAIL,
+            })
+        }
+      } catch (error) {
+        dispatch({
+            type:REFRESH_FAIL,
+        })
+      }
+    }
+    else{
+        dispatch({
+            type:REFRESH_FAIL,
+        }) 
+    }
+}
+
+export const logout = () => async(dispatch) =>{
+    dispatch({
+        type:LOGOUT
+    })
+    dispatch(setAelrt("la sesion fue cerrada con exito","green"))
+}
+
+export const Reset_Password = (email) => async (dispatch) => {
+    dispatch({
+        type:SET_AUTH_LOADING
+    })
+
+    const config = {
+        headers : {
+            "Content-Type" : "application/json"
+        }
+    }
+    const body = JSON.stringify({
+        email
+    })
+
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/users/reset_password/`,
+        body,
+        config)
+
+    try {
+        if (res.status === 200) {
+            dispatch({
+                type:RESET_PASSWORD_SUCCESS,
+                payload:res.data
+            })
+            dispatch({
+                type:REMOVE_AUTH_LOADING
+            })
+            dispatch(setAelrt("hemos enviado un email para que realices el cambio de la contraseña","green"))
+        }
+        else{
+            dispatch({
+                type:REMOVE_AUTH_LOADING
+            })
+            dispatch(setAelrt("no se ha podido completar el envio para la restauracion de la contraseña","red"))
+       
+        }
+    } catch (error) {
+        dispatch({
+            type:REMOVE_AUTH_LOADING
+        })
+        dispatch(setAelrt("no se ha podido completar el envio para la restauracion de la contraseña","red"))
+   
+    }
+}
+
+export const Reset_Password_Confirm = (uid,token,new_password,re_new_password) =>async (dispatch) =>{
+    dispatch({
+        type:SET_AUTH_LOADING
+    })
+    
+    const config = {
+        headers : {
+            "Content-Type" : "application/json"
+        }
+    }
+
+    const body = JSON.stringify({
+        uid,
+        token,
+        new_password,
+        re_new_password    })
+
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/users/reset_password_confirm/`,
+        body,
+        config)
+    
+        try {
+            if (res.status === 200) {
+                dispatch({
+                    type:RESET_PASSWORD_CONFIRM_SUCCESS,
+                    payload:res.data
+                })
+                dispatch({
+                    type:REMOVE_AUTH_LOADING
+                })
+                dispatch(setAelrt("contraseña modificada con exito","green"))  
+            }
+            else{
+                dispatch({
+                    type:RESET_PASSWORD_CONFIRM_FAIL,
+                })
+                dispatch({
+                    type:REMOVE_AUTH_LOADING
+                })
+                dispatch(setAelrt("no se ha podido completar el envio para la restauracion de la contraseña","red"))
+            }
+        } catch (error) {
+            dispatch({
+                type:RESET_PASSWORD_CONFIRM_FAIL,
+            })
+            dispatch({
+                type:REMOVE_AUTH_LOADING
+            })
+            dispatch(setAelrt("no se ha podido completar el envio para la restauracion de la contraseña","red"))
+        }
+}
