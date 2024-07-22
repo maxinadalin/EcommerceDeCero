@@ -80,7 +80,6 @@ export const Activate = (iud,token) = async (dispatch) => {
         uid,
         token
     })
-
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/activation/`,
       body,
       config)
@@ -275,12 +274,18 @@ export const Reset_Password = (email) => async (dispatch) => {
         }
         else{
             dispatch({
+                type:RESET_PASSWORD_FAIL,
+            })
+            dispatch({
                 type:REMOVE_AUTH_LOADING
             })
             dispatch(setAelrt("no se ha podido completar el envio para la restauracion de la contraseña","red"))
        
         }
     } catch (error) {
+        dispatch({
+            type:RESET_PASSWORD_FAIL,
+        })
         dispatch({
             type:REMOVE_AUTH_LOADING
         })
@@ -339,4 +344,46 @@ export const Reset_Password_Confirm = (uid,token,new_password,re_new_password) =
             })
             dispatch(setAelrt("no se ha podido completar el envio para la restauracion de la contraseña","red"))
         }
+}
+
+export const Check_Authenticated = () => async (dispatch) => {
+    if (localStorage.getItem(("access"))){
+        const config = {
+            headers : {
+                "accept" : "application/json",
+                "Content-Type": "application/json"
+            }
+        }
+        const body = JSON.stringify({
+            token : localStorage.getItem("access")
+        })
+
+        try {
+            const res = await axios.post(
+                `${process.env.REACT_APP_API_URL}/auth/jwt/verify/`,
+                body,
+                config
+              );
+              if (res.status === 200) {
+                dispatch({
+                    type: AUTHENTICATED_SUCCESS,
+                })
+              }
+              else{
+                dispatch({
+                    type: AUTHENTICATED_FAIL,
+                })
+              }
+        } catch (error) {
+            dispatch({
+                type: AUTHENTICATED_FAIL,
+            })
+        }
+   
+    }
+    else{
+        dispatch({
+            type: AUTHENTICATED_FAIL,
+        })
+    }
 }
