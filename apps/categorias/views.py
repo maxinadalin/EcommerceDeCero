@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from apps.categorias.serializers import CategoriaSerializers
-from .models import Categiria
+from .models import Categoria
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status,permissions
@@ -8,18 +8,18 @@ from rest_framework import status,permissions
 
 
 class CategoriaView(APIView):
-    permission_classes = (permission.AllowAny,)
+    permission_classes = (permissions.AllowAny,)
     def get(self,request,format=None):
-        if Categiria.objects.all().exists():
-            categorias = Categiria.objects.all()
+        if Categoria.objects.all().exists():
+            categorias = Categoria.objects.all()
             resultado = []
             
             for categoria in categorias:
                 if not categoria.parent:
                     item = {}
-                    item["id"] = categoria.id,
+                    item["id"] = categoria.id
                     item["name"] = categoria.name
-                    item['photo'] = category.photo.url if category.photo  else None
+                    item['photo'] = categoria.photo.url if categoria.photo  else None
                 
                     item["sub_categorias"] = []
                     

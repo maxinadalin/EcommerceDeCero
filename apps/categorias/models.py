@@ -3,9 +3,9 @@ from datetime import datetime
 # Create your models here.
 
 
-class Categiria(models.Model):
+class Categoria(models.Model):
     class Meta:
-        verbose_name = "categoria",
+        verbose_name = "categoria"
         verbose_name_plural = "categorias"
     
     parent = models.ForeignKey('self', related_name='children', on_delete=models.CASCADE,blank=True,null=True)
