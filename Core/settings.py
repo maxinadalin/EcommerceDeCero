@@ -41,7 +41,7 @@ DJANGO_APPS = [
 
 # here we put on all apps we will create
 PROJECT_APPS = ['apps.user',]
-ECOMMERCE_APPS = ['apps.categorias',]
+ECOMMERCE_APPS = ['apps.categorias','apps.productos']
 
 
 # in this section we put on everythings that we installed in requirements.txt
