@@ -19,7 +19,7 @@ class ProductosView(APIView):
             sortBy = "date_created"
         
         try :
-             productos = Productos.objects.all()
+             productos = Productos.objects.order_by(sortBy).all()
              productos = ProductoSerializers(productos, many=True)
 
              return Response({"Productos": productos.data},status = status.HTTP_200_OK)
@@ -70,8 +70,25 @@ class ProductoSearchCategorias(APIView):
     permission_classes = (permissions.AllowAny,)
     def post(self,request,format=None):
         data = self.request.data
+        categorias = []
         
-    
-        return Response({"mensaje":"probando a ver si anda esto"},status=status.HTTP_200_OK)
+        try:
+            categorias = data["categoria_id"]
+            
+            result=[]
+            for categoria in categorias:
+                if Productos.objects.filter(categoria=categoria).exists():
+                    productos = Productos.objects.filter(categoria=categoria).all()
+                     
+                result.extend(productos) 
+            
+            productos = ProductoSerializers(result,many=True)
+              
+           
+        except ValueError:
+                return Response({"mensaje":"la categorias deben ser un numero entero"},status= status.HTTP_400_BAD_REQUEST)
+        
+        
+        return Response({"productos":productos.data},status=status.HTTP_200_OK)
         
         
